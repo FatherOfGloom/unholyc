@@ -203,7 +203,7 @@ defer:
     return result;
 } 
 
-errno_t file_read_to_end(const char* file_path, Str* s) {
+errno_t file_read(const char* file_path, Str* s) {
     errno_t result = OK;
     file_t* f = NULL;
 

@@ -68,22 +68,6 @@ typedef FILE file_t;
 
 #define loop for(;;)
 
-#define foreach(T, item, vec) for (struct { usize __get_iter_fe(vec); T item; } __get_struct_fe(vec) = { .__get_iter_fe(vec) = 0, .item = (vec)->len > 0 ? (vec)->items[0] : 0 }; \
-    (__get_struct_fe(vec)).__get_iter_fe(vec) < (vec)->len; \
-    ++((__get_struct_fe(vec)).__get_iter_fe(vec)), (__get_struct_fe(vec)).item = __get_val_fe(vec))
-
-#define __get_struct_fe(vec) __s_fe_##vec
-#define __get_iter_fe(vec) __iter_fe_##vec
-#define __get_val_fe(vec) ((vec)->items[__get_struct_fe(vec).__get_iter_fe(vec)])
-#define f_val(vec) __get_val_fe(vec)
-#define f_idx(vec) __get_iter_fe(vec)
-
-#define enumerate(vec) for (usize __get_iter(vec) = 0; __get_iter(vec) < (vec)->count; ++(__get_iter(vec)))
-#define e_val(vec) __get_val(vec)
-#define e_idx(vec) __get_iter(vec)
-#define __get_iter(vec) __iter_##vec
-#define __get_val(vec) ((vec)->items[__get_iter(vec)])
-
 #define free_checked(ptr) do { if ((ptr)) { free((ptr)); } } while(0)
 #define nameof(x) #x
 #define discard (void)
@@ -164,33 +148,17 @@ Str str_clone(Str* s);
 void str_append_move(Str* dst, Str* src);
 void str_append_cpy(Str* dst, Str* src);
 Slice str_to_slice(Str* s, i32 from, i32 to);
-errno_t get_file_size(file_t* file, usize* size);
-
-// Tagged union for generic results
-typedef struct Res {
-    err_t kind;
-    union {
-        void* data;
-        Str error;
-    };
-} Res;
-
-#define unwrap(T, res) ({ assert((res.kind != ERR && str_to_cstr(res.error))); (T)(*((res).data)); })
-#define Res(T) Res
 
 typedef struct File {
     file_t* f;
-    const char* file_path;
+    Str file_path;
 } File;
 
-#define unwrap_file(res) unwrap(File, res)
-
-Res(File) file_open_or_create(const char* file_path);
-errno_t file_read(File* f, Str* s);
-void file_read_exact(File* f, Slice* s);
-usize file_write(File* f, Slice s);
+err_t file_write(const char* file_path, Slice s);
+err_t file_read_exact(file_t* file, Slice* s);
+errno_t file_read(const char* file_path, Str* s);
+errno_t get_file_size(file_t* file, usize* size);
 void file_close(File* f);
-
 
 typedef struct LifetimeChunk {
     struct LifetimeChunk* next;
@@ -208,5 +176,11 @@ typedef struct Lifetime {
 
 void* lifetime_share(Lifetime* l, usize size);
 void lifetime_drop(Lifetime* l);
+
+#define todo(...)                                                             \
+    do {                                                                      \
+        printf("%s:%d: UNIMPLEMENTED %s\n", __FILE__, __LINE__, __VA_ARGS__); \
+        exit(EXIT_FAILURE);                                                   \
+    } while (0)
 
 #endif // UNHOLY_C_H_
