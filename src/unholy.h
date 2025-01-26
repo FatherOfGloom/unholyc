@@ -160,6 +160,7 @@ errno_t file_read(const char* file_path, Str* s);
 errno_t get_file_size(file_t* file, usize* size);
 void file_close(File* f);
 
+// Lifetime allocator node
 typedef struct LifetimeChunk {
     struct LifetimeChunk* next;
     usize len_bytes;
@@ -167,6 +168,7 @@ typedef struct LifetimeChunk {
     u64 data[];
 } LifetimeChunk;
 
+// Allocator that manages group lifetimes
 typedef struct Lifetime {
     LifetimeChunk* begin;
     LifetimeChunk* end;
@@ -174,9 +176,12 @@ typedef struct Lifetime {
 
 #define LIFETIME_CAPACITY 1024
 
+// Allocates memory in a shared lifetime
 void* lifetime_share(Lifetime* l, usize size);
+// deallocate all of the objects in the shared lifetime
 void lifetime_drop(Lifetime* l);
 
+// panics that the caller function is not yet implemented
 #define todo(...)                                                             \
     do {                                                                      \
         printf("%s:%d: UNIMPLEMENTED %s\n", __FILE__, __LINE__, __VA_ARGS__); \

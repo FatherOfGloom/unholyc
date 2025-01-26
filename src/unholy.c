@@ -1,6 +1,5 @@
 #include "unholy.h"
 
-// append multiple items to a Vec
 void vec_append(Vec* v, usize item_size, const void* new_items, usize count) {
     if (v->len + count > v->capacity) {
         if (v->capacity == 0) {
@@ -27,7 +26,6 @@ void vec_pop(Vec* v, usize item_size) {
     v->len = v->len - item_size;
 }
 
-// Free heap allocation
 void vec_free(Vec* v) {
     if (v->items) {
         free(v->items);
@@ -98,7 +96,7 @@ Str str_from(const char* const cstr) {
 char* str_to_cstr(Str* s) {
     // The buf is memset to 0 after the allocation, so it automatically ends with '\0'
     // the only edge case is when the len is equal to capacity
-    if (str_len(*s) == str_cap(*s)) {
+    if (str_len(*s) >= str_cap(*s)) {
         // we don't want to call str_push(s, '\0') because it will affect the len of the string
         // and if we try to reverse it with str_reverse(s) the null character will be moved to the first position in the given string
         discard str_try_realloc(s, str_cap(*s) * 2);
@@ -267,6 +265,7 @@ Slice new_slice(usize size, void* data, usize len) {
 }
 
 LifetimeChunk* lifetime_alloc_chunk(Lifetime* l, usize cap_bytes) {
+    todo("");
     usize alloc_size = cap_bytes * sizeof(u64) + sizeof(LifetimeChunk);
 
     LifetimeChunk* result = (LifetimeChunk*)malloc(alloc_size);
@@ -279,6 +278,7 @@ LifetimeChunk* lifetime_alloc_chunk(Lifetime* l, usize cap_bytes) {
 }
 
 void* lifetime_share(Lifetime* l, usize len_bytes) {
+    todo("");
     void* result = NULL;
     usize size = (len_bytes + sizeof(u64) - 1) / sizeof(u64);
 
@@ -291,6 +291,7 @@ void* lifetime_share(Lifetime* l, usize len_bytes) {
 }
 
 void lifetime_drop(Lifetime* l) {
+    todo("");
     LifetimeChunk* c = l->begin;
 
     while (c) {
