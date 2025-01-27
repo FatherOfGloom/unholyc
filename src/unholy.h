@@ -128,7 +128,7 @@ typedef struct Str {
 #define str_free(s) vec_free(&((s)->v))
 
 // Print a string to stdout
-#define str_print(s) printf(STR_FMT, str_len(*s), str_to_cstr(s)) 
+#define str_print(s) printf(STR_FMT, (i32)str_len((*s)), str_to_cstr(s)) 
 
 // returns whether a given string has zero characters
 #define str_is_empty(s) vec_is_empty(&((s)->v))
